@@ -2,6 +2,7 @@ package com.burnweb.rnwebview;
 
 import android.annotation.SuppressLint;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.SystemClock;
 import android.graphics.Bitmap;
@@ -28,9 +29,19 @@ class RNWebView extends WebView implements LifecycleEventListener {
     private String baseUrl = "file:///";
     private String injectedJavaScript = null;
     private boolean allowUrlRedirect = false;
+    private String customSchemeForDeepLink = null;
 
     protected class EventWebClient extends WebViewClient {
-        public boolean shouldOverrideUrlLoading(WebView view, String url){
+
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+
+            if (RNWebView.this.getCustomSchemeForDeepLink() != null && url.startsWith(RNWebView.this.getCustomSchemeForDeepLink())) {
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                view.getContext().startActivity( intent );
+                return true;
+            }
+
             if(RNWebView.this.getAllowUrlRedirect()) {
                 // do your handling codes here, which url is the requested url
                 // probably you need to open that url rather than redirect:
@@ -42,6 +53,7 @@ class RNWebView extends WebView implements LifecycleEventListener {
             return super.shouldOverrideUrlLoading(view, url);
         }
 
+        @Override
         public void onPageFinished(WebView view, String url) {
             mEventDispatcher.dispatchEvent(new NavigationStateChangeEvent(getId(), SystemClock.uptimeMillis(), view.getTitle(), false, url, view.canGoBack(), view.canGoForward()));
 
@@ -50,12 +62,14 @@ class RNWebView extends WebView implements LifecycleEventListener {
             }
         }
 
+        @Override
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
             mEventDispatcher.dispatchEvent(new NavigationStateChangeEvent(getId(), SystemClock.uptimeMillis(), view.getTitle(), true, url, view.canGoBack(), view.canGoForward()));
         }
     }
 
     protected class CustomWebChromeClient extends WebChromeClient {
+
         @Override
         public boolean onJsAlert(WebView view, String url, String message, JsResult result) {
             getModule().showAlert(url, message, result);
@@ -73,6 +87,8 @@ class RNWebView extends WebView implements LifecycleEventListener {
         public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
             return getModule().startFileChooserIntent(filePathCallback, fileChooserParams.createIntent());
         }
+
+
     }
 
     protected class GeoWebChromeClient extends CustomWebChromeClient {
@@ -105,6 +121,7 @@ class RNWebView extends WebView implements LifecycleEventListener {
         }
 
         this.setWebViewClient(new EventWebClient());
+
         this.setWebChromeClient(getCustomClient());
     }
 
@@ -126,6 +143,14 @@ class RNWebView extends WebView implements LifecycleEventListener {
 
     public void setInjectedJavaScript(String injectedJavaScript) {
         this.injectedJavaScript = injectedJavaScript;
+    }
+
+    public String getCustomSchemeForDeepLink() {
+        return customSchemeForDeepLink;
+    }
+
+    public void setCustomSchemeForDeepLink(String customSchemeForDeepLink) {
+        this.customSchemeForDeepLink = customSchemeForDeepLink;
     }
 
     public String getInjectedJavaScript() {

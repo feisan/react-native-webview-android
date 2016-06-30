@@ -163,6 +163,11 @@ public class RNWebViewManager extends SimpleViewManager<RNWebView> {
         view.setInjectedJavaScript(injectedJavaScript);
     }
 
+    @ReactProp(name = "customSchemeForDeepLink")
+    public void setCustomSchemeForDeepLink(RNWebView view, @Nullable String customSchemeForDeepLink) {
+        view.setCustomSchemeForDeepLink(customSchemeForDeepLink);
+    }
+
     @Override
     public @Nullable Map<String, Integer> getCommandsMap() {
         return MapBuilder.of(
