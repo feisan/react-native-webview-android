@@ -36,21 +36,14 @@ class RNWebView extends WebView implements LifecycleEventListener {
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
 
-            if (RNWebView.this.getCustomSchemeForDeepLink() != null && url.startsWith(RNWebView.this.getCustomSchemeForDeepLink())) {
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                view.getContext().startActivity( intent );
-                return true;
-            }
-
-            if(RNWebView.this.getAllowUrlRedirect()) {
-                // do your handling codes here, which url is the requested url
-                // probably you need to open that url rather than redirect:
-                view.loadUrl(url);
-
-                return false; // then it is not handled by default action
-            }
-
-            return super.shouldOverrideUrlLoading(view, url);
+            if (url.startsWith("http://") || url.startsWith("https://")) {
+              return false;
+            } else {
+              Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url)); 
+              intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+              view.getContext().startActivity(intent);   
+              return true;   
+            } 
         }
 
         @Override
