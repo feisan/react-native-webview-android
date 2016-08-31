@@ -16,7 +16,7 @@ import com.facebook.react.uimanager.events.RCTEventEmitter;
     private final boolean mCanGoForward;
 
     protected NavigationStateChangeEvent(int viewTag, long timestampMs, String title, boolean isLoading, String url, boolean canGoBack, boolean canGoForward) {
-        super(viewTag, timestampMs);
+        super(viewTag);
 
         mTitle = title;
         mIsLoading = isLoading;
