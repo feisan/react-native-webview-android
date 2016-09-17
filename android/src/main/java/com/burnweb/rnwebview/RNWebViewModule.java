@@ -150,7 +150,10 @@ public class RNWebViewModule extends ReactContextBaseJavaModule implements Activ
     }
 
     @SuppressLint("NewApi")
-    @Override
+    public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
+        this.onActivityResult(requestCode, resultCode, data);
+    }
+
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_SELECT_FILE_LEGACY) {
             if (mUploadMessage == null) return;
@@ -166,6 +169,7 @@ public class RNWebViewModule extends ReactContextBaseJavaModule implements Activ
             mUploadMessageArr = null;
         }
     }
+
 
     // Required for RN 0.30+ modules than implement ActivityEventListener
     public void onNewIntent(Intent intent) { }
